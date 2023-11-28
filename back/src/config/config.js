@@ -5,6 +5,6 @@ module.exports={
         password: 'pass',
         port: 5432,
         host: 'localhost',
-        database: 'ins-enstat'
+        database: 'enstat-note'
     }
 }

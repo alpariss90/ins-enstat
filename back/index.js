@@ -3,6 +3,7 @@ const bodyParser=require('body-parser')
 const cors=require('cors')
 const morgan=require('morgan')
 const config=require('./src/config/config')
+const { sequelize } = require('./src/provider')
 
 
 
@@ -14,12 +15,12 @@ app.use(morgan('combined'))
 app.use(cors())
 
 
-app.get('/', (req, res)=>{
-    res.send({message: 'hello'})
-})
+require('./src/route')(app)
 
+
+//sequelize.sync({force: true});
 
 
 app.listen(config.app_port, (err)=>{
     console.log("App is runnig on "+config.app_port);
-})
+}) 
