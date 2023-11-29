@@ -17,6 +17,15 @@
                                     <li class="nav-item">
                                         <a class="nav-link" href="/semestre">SEMESTRES</a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/unite">UNITES</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/matiere">MATIERES</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/etudiant">ETUDIANTS</a>
+                                    </li>
                                    
                                 </ul>
                                 <form class="d-flex">

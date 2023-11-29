@@ -2,10 +2,9 @@ const {sequelize, DataTypes, QueryTypes}=require('./provider')
 
 
 const Etudiant=sequelize.define('etudiant', {
-    id:{
-        type: DataTypes.BIGINT,
-        primaryKey: true,
-        autoIncrement: true
+    matricule:{
+        type: DataTypes.STRING,
+        primaryKey: true
     },
     nom:{
         type: DataTypes.STRING,
@@ -118,11 +117,13 @@ const Users=sequelize.define('users', {
 
 
 Users.hasMany(Etudiant, {foreignKey: 'user'})
-Semestre.hasMany(Unite, {foreignKey: 'unite'})
+Users.hasMany(Semestre, {foreignKey: 'user'})
+Users.hasMany(Unite, {foreignKey: 'user'})
+Semestre.hasMany(Unite, {foreignKey: 'semestre'})
 Unite.hasMany(Matiere, {foreignKey: 'unite'})
 
 
 
 module.exports={
-    Users, Semestre, Unite, Etudiant, Annee, sequelize, QueryTypes
+    Users, Semestre, Unite, Etudiant, Annee, sequelize, QueryTypes, Matiere
 }

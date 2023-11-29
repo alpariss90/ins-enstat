@@ -1,5 +1,5 @@
 <template>
-    <layout-template pageTitre="GESTION DES SEMESTRES">
+    <layout-template pageTitre="GESTION DES ETUDIANTS">
 
         <div class="alert alert-danger" v-if="error != ''">
             <strong>Error!</strong> {{ error }}
@@ -24,9 +24,24 @@
 
                         <form action="">
                             <div class="mb-3 mt-3">
-                                <label for="email" class="form-label">LIBELLE :</label>
-                                <input type="text" autocomplete="off" v-model="semestre.libelle"
-                                    class="form-control form-control-sm" id="email" placeholder="Enter libelle semestre">
+                                <label for="email" class="form-label">MATRICULE :</label>
+                                <input type="text" autocomplete="off" v-model="etudiant.matricule"
+                                    class="form-control form-control-sm" :disabled="isMatDis" id="email" placeholder="Enter matricule etudiant">
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label for="email" class="form-label">NOM :</label>
+                                <input type="text" autocomplete="off" v-model="etudiant.nom"
+                                    class="form-control form-control-sm" id="email" placeholder="Enter nom etudiant">
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label for="email" class="form-label">PRENOM :</label>
+                                <input type="text" autocomplete="off" v-model="etudiant.prenom"
+                                    class="form-control form-control-sm" id="email" placeholder="Enter prenom etudiant">
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label for="email" class="form-label">AGE :</label>
+                                <input type="number" autocomplete="off" v-model="etudiant.age"
+                                    class="form-control form-control-sm" id="email" placeholder="Enter age etudiant">
                             </div>
 
                             <button type="reset" class="btn btn-danger btn-sm" v-if="etat=='create'">RESET</button>
@@ -43,25 +58,29 @@
                 <ion-card>
                     <ion-card-header style="background-color: #E2E8E5;">
                         <ion-card-title>
-                            LIST SEMESTRE
+                            LIST ETUDIANT
                         </ion-card-title>
                     </ion-card-header>
                     <ion-card-content >
-                        <div class="offset-lg-8 offset-md-8 col-lg-4 col-md-4"><ion-searchbar placeholder="id or libelle"  v-model="filter" />
+                        <div class="offset-lg-8 offset-md-8 col-lg-4 col-md-4"><ion-searchbar placeholder="matricule or nom or prenom"  v-model="filter" />
                         </div> <br />
                         <div style="overflow-y: scroll; max-height: 300px;">
                         <table class="table table-hover table-bordered"  >
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>LIBELLE</th>
+                                    <th>MATRICULE</th>
+                                    <th>NOM</th>
+                                    <th>PRENOM</th>
+                                    <th>AGE</th>
                                     <th style="text-align: right;">ACTIONS</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="s in com_getList" :key="s.id">
-                                    <th>{{ s.id }}</th>
-                                    <th>{{ s.libelle }}</th>
+                                    <th>{{ s.matricule }}</th>
+                                    <th>{{ s.nom }}</th>
+                                    <th>{{ s.prenom }}</th>
+                                    <th>{{ s.age }}</th>
                                     <th style="text-align: right;"><button class="btn btn-success btn-sm" @click="editForm(s)">edit</button></th>
                                 </tr>
                             </tbody>
@@ -80,30 +99,33 @@ import service from '../services/service';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonSearchbar } from '@ionic/vue'
 
 export default defineComponent({
-    name: 'semestrePage',
+    name: 'etudiantPage',
     components: { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonSearchbar },
     setup() {
         const state = reactive({
             error: '',
             success: '',
-            semestre: {
-                id: 0,
-                libelle: '',
+            etudiant: {
+                matricule: '',
+                nom: '',
+                prenom: '',
+                age: '',
                 user: 'admin' //A implementer apres la partie auth
             },
-            semestres: [],
+            etudiants: [],
             filter: '',
-            titreForm: 'Formulaire ajout semestre',
-            etat: 'create'
+            titreForm: 'Formulaire ajout etudiant',
+            etat: 'create',
+            isMatDis: false
 
         })
 
         const add = async () => {
-            if (state.semestre.libelle == '' || state.semestre.libelle == undefined)
+            if (state.etudiant.matricule == '' || state.etudiant.matricule == undefined || state.etudiant.nom == '' || state.etudiant.nom == undefined || state.etudiant.prenom == '' || state.etudiant.prenom == undefined || state.etudiant.age == '' || state.etudiant.age == undefined)
                 state.error = 'Veuillez remplir le champs libelle'
             else {
                 try {
-                    const response = await service.addSemestre({libelle: state.semestre.libelle})
+                    const response = await service.addEtudiant(state.etudiant)
                     changeEtat('create', null)
                     state.success = response.data.success;
                     getAll()
@@ -114,11 +136,11 @@ export default defineComponent({
         }
 
         const edit = async () => {
-            if (state.semestre.libelle == '' || state.semestre.libelle == undefined)
+            if (state.etudiant.matricule == '' || state.etudiant.matricule == undefined || state.etudiant.nom == '' || state.etudiant.nom == undefined || state.etudiant.prenom == '' || state.etudiant.prenom == undefined || state.etudiant.age == '' || state.etudiant.age == undefined)
                 state.error = 'Veuillez remplir le champs libelle'
             else {
                 try {
-                    const response = await service.editSemestre(state.semestre)
+                    const response = await service.editEtudiant(state.etudiant)
                     changeEtat('create', null)
                     state.success = response.data.success;
                     getAll()
@@ -128,17 +150,23 @@ export default defineComponent({
             }
         }
 
-        const changeEtat=(etat, semestre)=>{
+        const changeEtat=(etat, etudiant)=>{
             if(etat=='create'){
-                state.semestre.libelle=''
-                state.semestre.id=0
+                state.etudiant.matricule=''
+                state.etudiant.nom=''
+                state.etudiant.prenom=''
+                state.etudiant.age=''
                 state.etat='create'
-                state.titreForm='Formulaire ajout semestre'
+                state.isMatDis=false
+                state.titreForm='Formulaire ajout etudiant'
             }else{
-                state.semestre.libelle=semestre.libelle
-                state.semestre.id=semestre.id
+                state.etudiant.matricule=etudiant.matricule
+                state.etudiant.nom=etudiant.nom
+                state.etudiant.prenom=etudiant.prenom
+                state.etudiant.age=etudiant.age
                 state.etat='edit'
-                state.titreForm='Formulaire modification semestre'
+                state.isMatDis=true
+                state.titreForm='Formulaire modification etudiant'
             }
         }
 
@@ -161,19 +189,19 @@ export default defineComponent({
 
         const getAll = async () => {
             try {
-                const response = await service.getAllSemestre();
-                state.semestres = response.data.semestres;
+                const response = await service.getAllEtudiant();
+                state.etudiants = response.data.etudiants;
             } catch (error) {
-                console.log("Erreur get list semestre " + error);
+                console.log("Erreur get list etudiant " + error);
             }
         }
 
         const com_getList = computed(() => {
             if (state.filter == '')
-                return state.semestres
+                return state.etudiants
             else {
-                return state.semestres.filter(e => {
-                    return e.libelle.includes(state.filter) || e.id == state.filter
+                return state.etudiants.filter(e => {
+                    return e.matricule.toLowerCase().includes(state.filter.toLowerCase()) || e.nom.toLowerCase().includes(state.filter.toLowerCase()) || e.prenom.toLowerCase().includes(state.filter.toLowerCase())
                 })
             }
 

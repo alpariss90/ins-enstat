@@ -1,4 +1,4 @@
-const {Semestre, sequelize, QueryTypes}=require('./models')
+const {Semestre, sequelize, QueryTypes}=require('../models')
 
 
 module.exports={

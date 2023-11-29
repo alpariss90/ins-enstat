@@ -18,7 +18,7 @@ app.use(cors())
 require('./src/route')(app)
 
 
-//sequelize.sync({force: true});
+//sequelize.sync({alter: true});
 
 
 app.listen(config.app_port, (err)=>{

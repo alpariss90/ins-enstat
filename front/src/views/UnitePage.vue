@@ -1,5 +1,5 @@
 <template>
-    <layout-template pageTitre="GESTION DES SEMESTRES">
+    <layout-template pageTitre="GESTION DES UNITES">
 
         <div class="alert alert-danger" v-if="error != ''">
             <strong>Error!</strong> {{ error }}
@@ -24,9 +24,22 @@
 
                         <form action="">
                             <div class="mb-3 mt-3">
-                                <label for="email" class="form-label">LIBELLE :</label>
-                                <input type="text" autocomplete="off" v-model="semestre.libelle"
-                                    class="form-control form-control-sm" id="email" placeholder="Enter libelle semestre">
+                                <label  class="form-label">TITRE :</label>
+                                <input type="text" autocomplete="off" v-model="unite.titre"
+                                    class="form-control form-control-sm"  placeholder="Enter titre unite">
+                            </div>
+
+                            <div class="mb-3 mt-3">
+                                <label  class="form-label">LIBELLE :</label>
+                                <input type="text" autocomplete="off" v-model="unite.libelle"
+                                    class="form-control form-control-sm" placeholder="Enter libelle unite">
+                            </div>
+
+                            <div class="mb-3 mt-3">
+                                <label  class="form-label">SEMESTRE :</label>
+                                <select class="form-control form-control-sm" v-model="unite.semestre">
+                                    <option  v-for="s in semestres" :key="s.id" :value="s.id">{{ s.libelle }}</option>
+                                </select>
                             </div>
 
                             <button type="reset" class="btn btn-danger btn-sm" v-if="etat=='create'">RESET</button>
@@ -43,25 +56,29 @@
                 <ion-card>
                     <ion-card-header style="background-color: #E2E8E5;">
                         <ion-card-title>
-                            LIST SEMESTRE
+                            LIST unite
                         </ion-card-title>
                     </ion-card-header>
                     <ion-card-content >
-                        <div class="offset-lg-8 offset-md-8 col-lg-4 col-md-4"><ion-searchbar placeholder="id or libelle"  v-model="filter" />
+                        <div class="offset-lg-8 offset-md-8 col-lg-4 col-md-4"><ion-searchbar placeholder="id / libelle / titre / semestre"  v-model="filter" />
                         </div> <br />
                         <div style="overflow-y: scroll; max-height: 300px;">
                         <table class="table table-hover table-bordered"  >
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>TITRE</th>
                                     <th>LIBELLE</th>
+                                    <th>SEMESTRE</th>
                                     <th style="text-align: right;">ACTIONS</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="s in com_getList" :key="s.id">
                                     <th>{{ s.id }}</th>
+                                    <th>{{ s.titre }}</th>
                                     <th>{{ s.libelle }}</th>
+                                    <th>{{ s.libelle_semestre }}</th>
                                     <th style="text-align: right;"><button class="btn btn-success btn-sm" @click="editForm(s)">edit</button></th>
                                 </tr>
                             </tbody>
@@ -80,30 +97,33 @@ import service from '../services/service';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonSearchbar } from '@ionic/vue'
 
 export default defineComponent({
-    name: 'semestrePage',
+    name: 'unitePage',
     components: { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonSearchbar },
     setup() {
         const state = reactive({
             error: '',
             success: '',
-            semestre: {
+            unite: {
                 id: 0,
                 libelle: '',
+                titre: '',
+                semestre: '',
                 user: 'admin' //A implementer apres la partie auth
             },
-            semestres: [],
+            unites: [],
             filter: '',
-            titreForm: 'Formulaire ajout semestre',
-            etat: 'create'
+            titreForm: 'Formulaire ajout unite',
+            etat: 'create',
+            semestres: []
 
         })
 
         const add = async () => {
-            if (state.semestre.libelle == '' || state.semestre.libelle == undefined)
-                state.error = 'Veuillez remplir le champs libelle'
+            if (state.unite.libelle == '' || state.unite.libelle == undefined || state.unite.titre == '' || state.unite.titre == undefined || state.unite.semestre == '' || state.unite.semestre == undefined)
+                state.error = 'Veuillez remplir tout les champs'
             else {
                 try {
-                    const response = await service.addSemestre({libelle: state.semestre.libelle})
+                    const response = await service.addUnite({libelle: state.unite.libelle, titre: state.unite.titre, semestre: state.unite.semestre, user: state.unite.user})
                     changeEtat('create', null)
                     state.success = response.data.success;
                     getAll()
@@ -114,11 +134,11 @@ export default defineComponent({
         }
 
         const edit = async () => {
-            if (state.semestre.libelle == '' || state.semestre.libelle == undefined)
-                state.error = 'Veuillez remplir le champs libelle'
+            if (state.unite.libelle == '' || state.unite.libelle == undefined || state.unite.titre == '' || state.unite.titre == undefined || state.unite.semestre == '' || state.unite.semestre == undefined)
+                state.error = 'Veuillez remplir tout les champs'
             else {
                 try {
-                    const response = await service.editSemestre(state.semestre)
+                    const response = await service.editUnite(state.unite)
                     changeEtat('create', null)
                     state.success = response.data.success;
                     getAll()
@@ -128,23 +148,29 @@ export default defineComponent({
             }
         }
 
-        const changeEtat=(etat, semestre)=>{
+        const changeEtat=(etat, unite)=>{
             if(etat=='create'){
-                state.semestre.libelle=''
-                state.semestre.id=0
+                state.unite.libelle=''
+                state.unite.titre=''
+                state.unite.semestre=''
+                state.unite.id=0
                 state.etat='create'
-                state.titreForm='Formulaire ajout semestre'
+                state.titreForm='Formulaire ajout unite'
             }else{
-                state.semestre.libelle=semestre.libelle
-                state.semestre.id=semestre.id
+                state.unite.libelle=unite.libelle
+                state.unite.titre=unite.titre
+                state.unite.semestre=unite.semestre
+                state.unite.id=unite.id
                 state.etat='edit'
-                state.titreForm='Formulaire modification semestre'
+                state.titreForm='Formulaire modification unite'
             }
         }
 
         const editForm=(s)=>{
             changeEtat('edit', s)
         }
+
+       
 
         watch(() => state.error, () => {
             if (state.error != '') {
@@ -161,35 +187,38 @@ export default defineComponent({
 
         const getAll = async () => {
             try {
-                const response = await service.getAllSemestre();
+                const response = await service.getAllUnite()
+                state.unites = response.data.unites;
+            } catch (error) {
+                console.log("Erreur get list unite " + error);
+            }
+        }
+
+        const getAllSemestre = async () => {
+            try {
+                const response = await service.getAllSemestre()
                 state.semestres = response.data.semestres;
             } catch (error) {
-                console.log("Erreur get list semestre " + error);
+                console.log("Erreur get list semestres " + error);
             }
         }
 
         const com_getList = computed(() => {
             if (state.filter == '')
-                return state.semestres
+                return state.unites
             else {
-                return state.semestres.filter(e => {
-                    return e.libelle.includes(state.filter) || e.id == state.filter
+                return state.unites.filter(e => {
+                    return e.libelle.toLowerCase().includes(state.filter.toLowerCase()) || e.titre.toLowerCase().includes(state.filter.toLowerCase()) ||  e.libelle_semestre.toLowerCase().includes(state.filter.toLowerCase()) || e.id == state.filter
                 })
             }
-
         })
 
         onMounted(() => {
-            getAll()
+            getAll(),
+            getAllSemestre()
         })
 
-
-
-
-
-
         return { ...toRefs(state), getAll, com_getList, add, editForm, edit }
-
 
     }
 })
