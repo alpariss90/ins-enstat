@@ -17,7 +17,7 @@
                 <ion-card>
                     <ion-card-header style="background-color: #E2E8E5;">
                         <ion-card-title>
-                            FORMULARE SEMESTRE
+                           {{titreForm}}
                         </ion-card-title>
                     </ion-card-header>
                     <ion-card-content>
@@ -29,9 +29,11 @@
                                     class="form-control form-control-sm" id="email" placeholder="Enter libelle semestre">
                             </div>
 
-                            <button type="reset" class="btn btn-danger btn-sm">RESET</button>
+                            <button type="reset" class="btn btn-danger btn-sm" v-if="etat=='create'">RESET</button>
                             <button type="button" class="btn btn-primary btn-sm" style="float: right;"
-                                @click="add">ADD</button>
+                                @click="add" v-if="etat=='create'">ADD</button>
+                                <button type="button" class="btn btn-primary btn-sm" style="float: right;"
+                                @click="edit" v-if="etat=='edit'">EDIT</button>
                         </form>
 
                     </ion-card-content>
@@ -44,10 +46,11 @@
                             LIST SEMESTRE
                         </ion-card-title>
                     </ion-card-header>
-                    <ion-card-content>
+                    <ion-card-content >
                         <div class="offset-lg-8 offset-md-8 col-lg-4 col-md-4"><ion-searchbar placeholder="id or libelle"  v-model="filter" />
                         </div> <br />
-                        <table class="table table-hover table-bordered">
+                        <div style="overflow-y: scroll; max-height: 300px;">
+                        <table class="table table-hover table-bordered"  >
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -63,6 +66,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
                     </ion-card-content>
                 </ion-card>
             </div>
@@ -88,6 +92,8 @@ export default defineComponent({
             },
             semestres: [],
             filter: '',
+            titreForm: 'Formulaire ajout semestre',
+            etat: 'create'
 
         })
 
@@ -96,8 +102,8 @@ export default defineComponent({
                 state.error = 'Veuillez remplir le champs libelle'
             else {
                 try {
-                    const response = await service.addSemestre({ libelle: state.semestre.libelle })
-                    state.semestre.libelle=''
+                    const response = await service.addSemestre({libelle: state.semestre.libelle})
+                    changeEtat('create', null)
                     state.success = response.data.success;
                     getAll()
                 } catch (error) {
@@ -106,9 +112,37 @@ export default defineComponent({
             }
         }
 
+        const edit = async () => {
+            if (state.semestre.libelle == '' || state.semestre.libelle == undefined)
+                state.error = 'Veuillez remplir le champs libelle'
+            else {
+                try {
+                    const response = await service.editSemestre(state.semestre)
+                    changeEtat('create', null)
+                    state.success = response.data.success;
+                    getAll()
+                } catch (error) {
+                    state.error = error.response.data.error;
+                }
+            }
+        }
+
+        const changeEtat=(etat, semestre)=>{
+            if(etat=='create'){
+                state.semestre.libelle=''
+                state.semestre.id=0
+                state.etat='create'
+                state.titreForm='Formulaire ajout semestre'
+            }else{
+                state.semestre.libelle=semestre.libelle
+                state.semestre.id=semestre.id
+                state.etat='edit'
+                state.titreForm='Formulaire modification semestre'
+            }
+        }
+
         const editForm=(s)=>{
-            state.semestre.id=s.id
-            state.semestre.libelle=s.libelle
+            changeEtat('edit', s)
         }
 
         watch(() => state.error, () => {
@@ -153,7 +187,7 @@ export default defineComponent({
 
 
 
-        return { ...toRefs(state), getAll, com_getList, add, editForm }
+        return { ...toRefs(state), getAll, com_getList, add, editForm, edit }
 
 
     }
