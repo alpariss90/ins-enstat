@@ -1,4 +1,4 @@
-const {Semestre, sequelize, QueryTypes}=require('../models')
+const {Semestre, Annee, sequelize, QueryTypes}=require('../models')
 
 
 module.exports={
@@ -33,13 +33,21 @@ module.exports={
             res.status(404).send({error: 'Error getById '+error})
         }
     },
-
     async getAll(req, res){
         try {
             const semestres=await Semestre.findAll()
             res.send({semestres: semestres})
         } catch (error) {
             console.log('Error getAll semestre '+error);
+            res.status(404).send({error: 'Error getAll '+error})
+        }
+    },
+    async getAllAnnee(req, res){
+        try {
+            const annees=await Annee.findAll()
+            res.send({annees: annees})
+        } catch (error) {
+            console.log('Error getAll annees '+error);
             res.status(404).send({error: 'Error getAll '+error})
         }
     }

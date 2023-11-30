@@ -26,6 +26,9 @@
                                     <li class="nav-item">
                                         <a class="nav-link" href="/etudiant">ETUDIANTS</a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/inscription">INSCRIPTION</a>
+                                    </li>
                                    
                                 </ul>
                                 <form class="d-flex">

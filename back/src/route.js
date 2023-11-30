@@ -2,9 +2,11 @@ const semestreCtrl=require('./controllers/semestreCtrl')
 const uniteCtrl=require('./controllers/uniteCtrl')
 const matiereCtrl=require('./controllers/matiereCtrl')
 const etudiantCtrl= require('./controllers/etudiantCtrl')
+const inscriptionCtrl=require('./controllers/inscriptionCtrl')
 
 module.exports=(app)=>{
     app.get('/', semestreCtrl.accueil),
+    app.get('/annee/list', semestreCtrl.getAllAnnee),
     /**
      * Semestre
      */
@@ -38,6 +40,16 @@ module.exports=(app)=>{
     app.post('/etudiant/edit', etudiantCtrl.edit),
     app.get('/etudiant/get/:matricule', etudiantCtrl.getById),
     app.get('/etudiant/all', etudiantCtrl.getAll)
+
+
+     /***
+     * Inscription
+     */
+     app.post('/inscription/save', inscriptionCtrl.add)
+     app.post('/inscription/save-multiple', inscriptionCtrl.addMany)
+     app.post('/inscription/edit', inscriptionCtrl.edit),
+     app.get('/inscription/get/:matricule', inscriptionCtrl.getById),
+     app.get('/inscription/all', inscriptionCtrl.getAll)
 }
 
 

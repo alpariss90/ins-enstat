@@ -1,4 +1,4 @@
-const {sequelize, DataTypes, QueryTypes}=require('./provider')
+const {sequelize, DataTypes, QueryTypes, transact}=require('./provider')
 
 
 const Etudiant=sequelize.define('etudiant', {
@@ -12,7 +12,7 @@ const Etudiant=sequelize.define('etudiant', {
     },
     prenom:{
         type:DataTypes.STRING,
-        allowNull: false
+        allowNull: false 
     },
     age:{
         type: DataTypes.INTEGER,
@@ -21,6 +21,8 @@ const Etudiant=sequelize.define('etudiant', {
 },{
     freezeTableName: true
 })
+
+
 
 const Annee=sequelize.define('annee',{
     id: {
@@ -112,8 +114,46 @@ const Users=sequelize.define('users', {
     freezeTableName: true
 })
 
-
-
+const Inscription=sequelize.define('inscription',{
+    id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    etudiant:{
+        type: DataTypes.STRING,
+        references:{
+            model: Etudiant,
+            key: 'matricule'
+        },
+        unique: 'uniqueUserItemType'
+    },
+    semestre:{
+        type: DataTypes.INTEGER,
+        references:{
+            model: Semestre,
+            key: 'id'
+        },
+        unique: 'uniqueUserItemType'
+    },
+    annee:{
+        type: DataTypes.INTEGER,
+        references:{
+            model: Annee,
+            key: 'id'
+        },
+        unique: 'uniqueUserItemType'
+    },
+    user:{
+        type: DataTypes.STRING,
+        references:{
+            model: Users,
+            key: 'login'
+        }
+    }
+},{
+    freezeTableName: true
+})
 
 
 Users.hasMany(Etudiant, {foreignKey: 'user'})
@@ -124,6 +164,7 @@ Unite.hasMany(Matiere, {foreignKey: 'unite'})
 
 
 
+
 module.exports={
-    Users, Semestre, Unite, Etudiant, Annee, sequelize, QueryTypes, Matiere
+    Users, Semestre, Unite, Etudiant, Annee, sequelize, QueryTypes, Matiere, Inscription, transact
 }

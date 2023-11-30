@@ -8,6 +8,9 @@ export default{
     getAllSemestre(){
         return API().get('semestre/all')
     },
+    getAllAnnee(){
+        return API().get('annee/list')
+    },
     getSemestreById(id){
         return API().get('semestre/get/'+id)
     },
@@ -63,6 +66,22 @@ export default{
     },
     editEtudiant(etudiant){
         return API().post('etudiant/edit', etudiant)
+    },
+
+
+    //Inscription
+
+    getAllInscription(){
+        return API().get('inscription/all')
+    },
+    addInscription(inscription){
+        return API().post('inscription/save', inscription)
+    },
+    addInscriptionMultiple(inscription){
+        return API().post('inscription/save-multiple', inscription)
+    },
+    editInscription(inscription){
+        return API().post('inscription/edit', inscription)
     }
 
 

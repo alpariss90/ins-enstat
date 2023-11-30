@@ -4,11 +4,12 @@ import SemestrePage from '../views/SemestrePage.vue'
 import  UnitePage from '../views/UnitePage.vue'
 import MatierePage from '../views/MatierePage.vue'
 import EtudiantPage from '../views/EtudiantPage.vue'
+import InscriptionPage from '../views/InscriptionPage.vue'
 
 const routes= [
   {
     path: '/',
-    redirect: '/semestre'
+    redirect: '/etudiant'
   },
   {
     path: '/home',
@@ -17,6 +18,7 @@ const routes= [
   },
   {
     path: '/semestre',
+    name: 'Semestre',
     component: SemestrePage
   },
   {
@@ -30,6 +32,10 @@ const routes= [
   {
     path: '/etudiant',
     component: EtudiantPage
+  },
+  {
+    path: '/inscription',
+    component: InscriptionPage
   }
 ]
 
