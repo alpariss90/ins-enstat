@@ -27,7 +27,10 @@
                                         <a class="nav-link" href="/etudiant">ETUDIANTS</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="/inscription">INSCRIPTION</a>
+                                        <a class="nav-link" href="/inscription">INSCRIPTIONS</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/note">NOTES</a>
                                     </li>
                                    
                                 </ul>

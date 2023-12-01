@@ -3,6 +3,7 @@ const uniteCtrl=require('./controllers/uniteCtrl')
 const matiereCtrl=require('./controllers/matiereCtrl')
 const etudiantCtrl= require('./controllers/etudiantCtrl')
 const inscriptionCtrl=require('./controllers/inscriptionCtrl')
+const noteCtrl=require('./controllers/noteCtrl')
 
 module.exports=(app)=>{
     app.get('/', semestreCtrl.accueil),
@@ -48,8 +49,23 @@ module.exports=(app)=>{
      app.post('/inscription/save', inscriptionCtrl.add)
      app.post('/inscription/save-multiple', inscriptionCtrl.addMany)
      app.post('/inscription/edit', inscriptionCtrl.edit),
-     app.get('/inscription/get/:matricule', inscriptionCtrl.getById),
+     app.get('/inscription/get/:id', inscriptionCtrl.getById),
      app.get('/inscription/all', inscriptionCtrl.getAll)
+
+
+     /***
+     * Note
+     */
+     app.post('/note/save', noteCtrl.add)
+     app.post('/note/save-multiple', noteCtrl.addMany)
+     app.post('/note/edit', noteCtrl.edit),
+     app.get('/note/get/:id', noteCtrl.getById),
+     app.get('/note/all', noteCtrl.getAll)
+     app.get('/note/annee', noteCtrl.getAnneIns)
+     app.get('/note/semestre', noteCtrl.getSemestreIns)
+     app.get('/note/etudiant/:semestre', noteCtrl.getEtudiantIns)
+     app.get('/note/ue/semestre/:semestre', noteCtrl.getUEBySemestre)
+     app.get('/note/matiere/ue/:unite', noteCtrl.getMatiereByUE)
 }
 
 

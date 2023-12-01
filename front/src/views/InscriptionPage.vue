@@ -25,14 +25,14 @@
                         <form action="">
                             <div class="mb-3 mt-3">
                                 <label class="form-label">ANNEE :</label>
-                                <select class="form-control form-control-sm" v-model="inscription.annee" :disabled="true">
+                                <select class="form-control form-control-sm" v-model="inscription.annee" :disabled="true" >
                                     <option v-for="s in annees" :key="s.id" :value="s.id">{{ s.libelle }}</option>
                                 </select>
                             </div>
 
                             <div class="mb-3 mt-3">
                                 <label class="form-label">SEMESTRE :</label>
-                                <select class="form-control form-control-sm" v-model="inscription.semestre">
+                                <select class="form-control form-control-sm" v-model="inscription.semestre" style="height: 120px;" multiple>
                                     <option v-for="s in semestres" :key="s.id" :value="s.id">{{ s.libelle }}</option>
                                 </select>
                             </div>
@@ -58,7 +58,7 @@
                 <ion-card>
                     <ion-card-header style="background-color: #E2E8E5;">
                         <ion-card-title>
-                            LIST ETUDIANT {{ filter }}
+                            LIST ETUDIANT
                         </ion-card-title>
                     </ion-card-header>
                     <ion-card-content>
@@ -73,13 +73,15 @@
                         <table class="table table-hover table-bordered"  >
                             <thead>
                                 <tr>
+                                    <th>SEMESTRE</th>
                                     <th>MATRICULE</th>
-                                    <th>NOM</th>
+                                    <th>NOM</th> 
                                     <th>PRENOM</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="s in com_getList" :key="s.id">
+                                    <td>{{ s.libelle_semestre }}</td>
                                     <td>{{ s.matricule }}</td>
                                     <td>{{ s.nom }}</td>
                                     <td>{{ s.prenom }}</td>
@@ -111,7 +113,7 @@ export default defineComponent({
             annees: [],
             inscription: {
                 annee: 3,
-                semestre: '',
+                semestre: [],
                 etudiants: [],
                 user: 'admin' //A implementer
             },
@@ -125,16 +127,16 @@ export default defineComponent({
 
 
         const add = async () => {
-            if (state.inscription.annee == '' || state.inscription.annee == undefined || state.inscription.semestre == '' || state.inscription.semestre == undefined || state.inscription.etudiants.length == 0)
+            if (state.inscription.annee == '' || state.inscription.annee == undefined || state.inscription.semestre.length==0 || state.inscription.etudiants.length == 0)
                 state.error = 'Veuillez remplir tout les champs'
             else {
                 fecthInscription()
+                //console.log(state.inscriptions);
                 try {
-                    const response = await service.addInscriptionMultiple(state.inscriptions)
+                    const response =await service.addInscriptionMultiple(state.inscriptions)
                     changeEtat('create', null)
                     state.success = response.data.success;
-                    console.log('ss');
-                    console.log(response);
+                    //console.log(response);
                     getAll()
                 } catch (error) {
                     console.log('ee');
@@ -158,8 +160,6 @@ export default defineComponent({
         const getAll = async () => {
             try {
                 const response = await service.getAllInscription();
-                console.log('all');
-                console.log(response.data.inscriptions);
                 state.inscriptions = response.data.inscriptions;
             } catch (error) {
                 console.log("Erreur get list inscription " + error);
@@ -170,7 +170,7 @@ export default defineComponent({
         const changeEtat = (etat, ins) => {
             if (etat == 'create') {
                 state.inscription.annee = 3
-                state.inscription.semestre = ''
+                state.inscription.semestre = []
                 state.inscription.etudiants = []
                 state.etat = 'create'
                 state.titreForm = 'Formulaire ajout inscription'
@@ -215,9 +215,17 @@ export default defineComponent({
 
         const fecthInscription = () => {
             let ins = []
+            //console.log('etud');
+            //console.log(state.inscription.etudiants);
+            //console.log('semes');
+            console.log(state.inscription.semestre);
             for (let i = 0; i < state.inscription.etudiants.length; i++) {
-                ins.push({ etudiant: state.inscription.etudiants[i], semestre: state.inscription.semestre, annee: state.inscription.annee, user: state.inscription.user })
+                for(let j=0; j<state.inscription.semestre.length; j++){
+                    ins.push({ etudiant: state.inscription.etudiants[i], semestre: state.inscription.semestre[j], annee: state.inscription.annee, user: state.inscription.user })
+                }
             }
+            //console.log('res');
+            //console.log(ins);
             state.inscriptions = ins;
         }
 

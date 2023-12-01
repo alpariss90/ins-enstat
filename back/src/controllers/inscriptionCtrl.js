@@ -15,12 +15,12 @@ module.exports={
     async addMany(req, res){
         try {
             const result=await sequelize.transaction(async(transact)=>{
-                const inscription=await Inscription.bulkCreate(req.body,{transaction: transact}) 
+                const inscription=await Inscription.bulkCreate(req.body,{transaction: transact})
+                //await transact.commit() 
                 res.send({success: 'Inscription succefly added'})
             })
-                       
-            //await transact.commit()
-        } catch (error) {
+            
+        } catch (error) { 
             //await transact.rollback()
             console.log("Add Inscription "+error);
             res.status(404).send({error: 'Inscription existe déja '+error})

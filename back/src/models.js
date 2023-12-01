@@ -156,6 +156,85 @@ const Inscription=sequelize.define('inscription',{
 })
 
 
+const Note=sequelize.define('note',{
+    id:{
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    matricule:{
+        type: DataTypes.STRING,
+        references:{
+            model: Etudiant,
+            key: 'matricule'
+        },
+        unique: 'uniqueAnnee'
+    }, 
+    nom:{
+        type: DataTypes.STRING
+    },
+    prenom:{
+        type: DataTypes.STRING
+    },
+    annee:{
+        type: DataTypes.INTEGER,
+        references:{
+            model: Annee,
+            key: 'id'
+        },
+        unique: 'uniqueAnnee'
+    },
+    libelle_annee:{
+        type: DataTypes.STRING
+    },
+    semestre: {
+        type: DataTypes.INTEGER,
+        references:{
+            model: Semestre,
+            key: 'id'
+        },
+        unique: 'uniqueAnnee'
+    },
+    libelle_semestre: {
+        type: DataTypes.STRING
+    },
+    unite: {
+        type: DataTypes.INTEGER,
+        references:{
+            model: Unite,
+            key: 'id'
+        },
+        unique: 'uniqueAnnee'
+    },
+    libelle_unite: {
+        type: DataTypes.STRING
+    },
+    matiere: {
+        type: DataTypes.INTEGER,
+        references:{
+            model: Matiere,
+            key: 'id'
+        },
+        unique: 'uniqueAnnee'
+    },
+    libelle_matiere: {
+        type: DataTypes.STRING
+    },
+    users: {
+        type: DataTypes.STRING,
+        references:{
+            model: Users,
+            key: 'login'
+        }
+    },
+    note:{
+        type: DataTypes.INTEGER,
+    }
+},{
+    freezeTableName: true
+})
+
+
 Users.hasMany(Etudiant, {foreignKey: 'user'})
 Users.hasMany(Semestre, {foreignKey: 'user'})
 Users.hasMany(Unite, {foreignKey: 'user'})
@@ -166,5 +245,5 @@ Unite.hasMany(Matiere, {foreignKey: 'unite'})
 
 
 module.exports={
-    Users, Semestre, Unite, Etudiant, Annee, sequelize, QueryTypes, Matiere, Inscription, transact
+    Users, Semestre, Unite, Etudiant, Annee, sequelize, QueryTypes, Matiere, Inscription, transact, Note
 }

@@ -5,6 +5,7 @@ import  UnitePage from '../views/UnitePage.vue'
 import MatierePage from '../views/MatierePage.vue'
 import EtudiantPage from '../views/EtudiantPage.vue'
 import InscriptionPage from '../views/InscriptionPage.vue'
+import NotePage from '../views/NotePage.vue'
 
 const routes= [
   {
@@ -36,6 +37,10 @@ const routes= [
   {
     path: '/inscription',
     component: InscriptionPage
+  },
+  {
+    path: '/note',
+    component: NotePage
   }
 ]
 

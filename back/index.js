@@ -21,7 +21,7 @@ app.use((req, res, next)=>{
 
 
 require('./src/route')(app)
-
+ 
   
 //sequelize.sync({alter: true});
 
