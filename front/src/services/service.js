@@ -108,5 +108,8 @@ export default {
   },
   getMatiereByUE(unite) {
     return API().get("note/matiere/ue/" + unite);
+  },
+  getNoteFilter(annee, semestre, unite, matiere) {
+    return API().get("note/filter/" + annee+"/"+semestre+"/"+unite+"/"+matiere);
   }
 };

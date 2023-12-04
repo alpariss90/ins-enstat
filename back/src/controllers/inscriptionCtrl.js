@@ -48,7 +48,7 @@ module.exports={
 
     async getAll(req, res){
         try {
-            const inscriptions=await sequelize.query("select * from v_inscription",{
+            const inscriptions=await sequelize.query("SELECT i.id, i.etudiant, i.semestre, i.annee,i.user,e.matricule, e.nom, e.prenom,s.libelle AS libelle_semestre,a.libelle AS libelle_annee FROM inscription i,etudiant e,semestre s,USER u,annee a WHERE i.etudiant::text = e.matricule::text AND i.semestre = s.id AND i.annee = a.id",{
                 replacements: {},
                 type: QueryTypes.SELECT
             })

@@ -73,7 +73,7 @@
                 <ion-card>
                     <ion-card-header style="background-color: #E2E8E5;">
                         <ion-card-title>
-                            LIST ETUDIANT
+                            LIST ETUDIANT 
                         </ion-card-title>
                     </ion-card-header>
                     <ion-card-content>
@@ -96,13 +96,13 @@
                                     </tr>
                                     <tr v-for="s in etudiants_ins" :key="s.matricule" style="padding-top: 3px;">
                                         <td><!--<label>{{ s.matricule }}</label> -- -->{{ s.nom }} {{ s.prenom }}</td>
-                                        <td><input type="number" class="form-control from-control-sm" v-model="s.note1"
+                                        <td><input :disabled="notes.nombre_note<1" type="number" class="form-control from-control-sm" v-model="s.note1"
                                                 placeholder="note 1" /></td>
-                                        <td><input type="number" class="form-control from-control-sm" v-model="s.note2"
+                                        <td><input :disabled="notes.nombre_note < 2" type="number" class="form-control from-control-sm" v-model="s.note2"
                                                 placeholder="note 2" /></td>
-                                        <td><input type="number" class="form-control from-control-sm" v-model="s.note3"
+                                        <td><input :disabled="notes.nombre_note < 3" type="number" class="form-control from-control-sm" v-model="s.note3"
                                                 placeholder="note 3" /></td>
-                                        <td><input type="number" class="form-control from-control-sm" v-model="s.note4"
+                                        <td><input :disabled="notes.nombre_note <4" type="number" class="form-control from-control-sm" v-model="s.note4"
                                                 placeholder="note 4" /></td>
                                     </tr>
                                     <tr>
@@ -148,7 +148,7 @@
                 <ion-card>
                     <ion-card-header style="background-color: #E2E8E5;">
                         <ion-card-title>
-                            FILTRE 
+                            FILTRE
                         </ion-card-title>
                     </ion-card-header>
                     <ion-card-content>
@@ -163,7 +163,7 @@
 
                         <div class="mb-3 mt-3">
                             <label class="form-label">MATIERES : </label>
-                            <select class="form-control form-control-sm" v-model="c_matiere" @change="getEtudiantIns()">
+                            <select class="form-control form-control-sm" v-model="c_matiere" @change="initMatiere()">
                                 <option v-for="s in matieres" :key="s.id" :value="[s.id, s.libelle, s.credit]">{{ s.libelle
                                 }}
                                 </option>
@@ -187,17 +187,19 @@
                 </ion-card>
             </div>
         </div>
+        <note-liste :notes="liste_note"></note-liste>
     </layout-template>
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs, onMounted, watch/*computed, , , */ } from 'vue';
+import { defineComponent, reactive, toRefs, onMounted, watch} from 'vue';
 import service from '../services/service';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardContent } from '@ionic/vue'
+import NoteListe from '../components/NoteListeComponent.vue';
 
 export default defineComponent({
     name: 'inscriptionPage',
-    components: { IonCard, IonCardContent, IonCardHeader, IonCardTitle },
+    components: { IonCard, IonCardContent, IonCardHeader, IonCardTitle, NoteListe },
     setup() {
         const state = reactive({
             error: '',
@@ -233,7 +235,8 @@ export default defineComponent({
             c_semestre: '',
             c_unite: '',
             c_matiere: '',
-            notes_saisie: []
+            notes_saisie: [],
+            liste_note: []
 
 
         })
@@ -243,7 +246,6 @@ export default defineComponent({
             try {
                 const response = await service.getAnneeIns();
                 state.annees_ins = response.data.annees_ins;
-                console.log(response);
             } catch (error) {
                 console.log("Erreur getAnneeIns ", error);
             }
@@ -259,11 +261,24 @@ export default defineComponent({
         }
 
         const getUniteBySemestre = async () => {
+            
             try {
-                const response = await service.getUEbySemestre(state.notes.semestre);
+                const response = await service.getUEbySemestre(state.c_semestre[0]);
                 state.unites = response.data.unites_semestre;
-                state.c_unite = ''
-                state.c_matiere = ''
+                state.notes.libelle_semestre=state.c_semestre[1]
+                state.notes.semestre=state.c_semestre[0]
+                state.notes.matiere = ''
+                state.notes.libelle_matiere = ''
+                state.notes.unite = ''
+                state.notes.libelle_unite = ''
+                state.c_matiere=[]
+                state.c_unite=[]
+                state.matieres=[]
+                state.etudiants_ins=[]
+                state.liste_note=[]
+                
+
+
             } catch (error) {
                 console.log("Erreur getUniteBySemestre ", error);
             }
@@ -271,47 +286,70 @@ export default defineComponent({
 
         const getMatiereByUE = async () => {
             try {
-                const response = await service.getMatiereByUE(state.notes.unite);
+                const response = await service.getMatiereByUE(state.c_unite[0]);
                 state.matieres = response.data.matieres_unite;
                 state.notes.matiere = ''
                 state.notes.libelle_matiere = ''
+                state.notes.libelle_unite=state.c_unite[1]
+                state.notes.unite=state.c_unite[0]
+                state.c_matiere=[]
+                state.etudiants_ins=[]
+                state.liste_note=[]
+
+
             } catch (error) {
                 console.log("Erreur getMatiereByUE ", error);
             }
+        }
+
+        const initMatiere=()=>{
+            state.notes.libelle_matiere=state.c_matiere[1]
+            state.notes.matiere=state.c_matiere[0]
+            getEtudiantIns()
+            getNoteFilter()
+
         }
 
         const getEtudiantIns = async () => {
             try {
                 const response = await service.getEtudiantIns(state.notes.semestre);
                 state.etudiants_ins = response.data.etudiants_ins;
-
-
             } catch (error) {
                 console.log("Erreur getEtudiantIns ", error);
             }
         }
 
-        //const addNoteOnEtudiantIns=()=>{
-        //console.log('Etudiant Ins');
-        //console.log(state.etudiants_ins);
-        //for(let i=0; i<state.etudiants_ins.length; i++){
-        //  state.notes_saisie.push({matricule: state.etudiants_ins[i].matricule, nom: state.etudiants_ins[i].nom, prenom: state.etudiants_ins[i].prenom, note: ''})
-        //state.etudiants_ins.note=''
-        //}
 
-
-        //}
+        const getNoteFilter = async () => {
+            try {
+                const response = await service.getNoteFilter(state.notes.annee, state.notes.semestre, state.notes.unite, state.notes.matiere)
+                state.liste_note = response.data.liste_note;
+                console.log(state.liste_note);
+            } catch (error) {
+                console.log("Erreur getNoteFilter ", error);
+            }
+        }
 
         const initSelect = () => {
+            state.notes.libelle_annee=state.c_annee[1]
+            state.notes.annee=state.c_annee[0]
             state.notes.semestre = ''
             state.notes.unite = ''
             state.notes.matiere = ''
+            state.etudiants_ins=[]
         }
 
         const add = async () => {
-            if (state.notes.annee == '' || state.notes.annee == undefined || state.notes.semestre == '' || state.notes.semestre == undefined || state.notes.unite == '' || state.notes.unite == undefined || state.notes.matiere == '' || state.notes.matiere == undefined || state.notes.nombre_note == undefined || state.notes.nombre_note == '')
+            
+            if (
+                state.notes.annee === "" || state.notes.annee == undefined
+                || state.notes.semestre === "" || state.notes.semestre == undefined
+                || state.notes.unite === "" || state.notes.unite == undefined
+                || state.notes.matiere === "" || state.notes.matiere == undefined
+                || state.notes.nombre_note == undefined || state.notes.nombre_note === ""
+            )
                 state.error = 'Veuillez remplir tout les champs'
-            else if (!checkEtudiantInsNote()) {
+            else if (!checkEtudiantInsNote() || state.notes.nombre_note < 0 || state.notes.nombre_note > 4) {
                 state.error = 'Verifier les notes saisies'
             } else {
                 try {
@@ -325,15 +363,24 @@ export default defineComponent({
 
         const checkEtudiantInsNote = () => {
             let isOk = true;
+            /*switch (notes.nombre_note) {
+                case 1:
+                    
+                    break;
+            
+                default:
+                    break;
+            }*/
             for (let i = 0; i < state.etudiants_ins.length; i++) {
                 if ('note1' in state.etudiants_ins[i] == false || 'note2' in state.etudiants_ins[i] == false || 'note3' in state.etudiants_ins[i] == false || 'note4' in state.etudiants_ins[i] == false) {
                     isOk = false
+                    alert('1')
                     break;
                 } else if (
-                    state.etudiants_ins[i].note1 == '' || state.etudiants_ins[i].note1 == undefined || state.etudiants_ins[i].note1 > 20 || state.etudiants_ins[i].note1 < 0
-                    || state.etudiants_ins[i].note2 == '' || state.etudiants_ins[i].note2 == undefined || state.etudiants_ins[i].note2 > 20 || state.etudiants_ins[i].note2 < 0
-                    || state.etudiants_ins[i].note3 == '' || state.etudiants_ins[i].note3 == undefined || state.etudiants_ins[i].note3 > 20 || state.etudiants_ins[i].note3 < 0
-                    || state.etudiants_ins[i].note4 == '' || state.etudiants_ins[i].note4 == undefined || state.etudiants_ins[i].note4 > 20 || state.etudiants_ins[i].note4 < 0
+                    state.etudiants_ins[i].note1 === "" || state.etudiants_ins[i].note1 == undefined || state.etudiants_ins[i].note1 > 20 || state.etudiants_ins[i].note1 < 0
+                    || state.etudiants_ins[i].note2 === "" || state.etudiants_ins[i].note2 == undefined || state.etudiants_ins[i].note2 > 20 || state.etudiants_ins[i].note2 < 0
+                    || state.etudiants_ins[i].note3 === "" || state.etudiants_ins[i].note3 == undefined || state.etudiants_ins[i].note3 > 20 || state.etudiants_ins[i].note3 < 0
+                    || state.etudiants_ins[i].note4 === "" || state.etudiants_ins[i].note4 == undefined || state.etudiants_ins[i].note4 > 20 || state.etudiants_ins[i].note4 < 0
                 ) {
                     isOk = false
                     break
@@ -375,90 +422,14 @@ export default defineComponent({
         }
 
 
-        /*
-        const getMoyenneUnite=(unite, totalCredit, moyenne_matiere)=>{
-            const matiere_unite = state.matieres.filter(e => {
-                return e.unite == unite
-            });
-
-            let moyenne_unite=0
-            matiere_unite.forEach(m=>{
-                moyenne_unite=(m.credit * moyenne_matiere)
-            })
-
-            return moyenne_unite/totalCredit
-        }
-
-        const getUniteCredit = (unite) => {
-            const matiere_unite = state.matieres.filter(e => {
-                return e.unite == unite
-            });
-            let totalCredit=0;
-            matiere_unite.forEach(m => {
-                totalCredit+=m.credit
-            });
-            return totalCredit
-        }*/
-
 
 
         onMounted(() => {
             getAnneeIns(), getSemestreIns()
         })
 
-        /*
-                const com_getListEtudiant = computed(() => {
-                    if (state.notes.annee == '' || state.notes.semestre == '' || state.notes.unite == '' || state.notes.matiere == '')
-                        return []
-                    else {
-                        return state.etudiants_ins
-                    }
+
         
-                })*/
-
-
-
-
-        watch(() => state.c_annee, () => {
-
-            state.notes.annee = state.c_annee[0]
-            state.notes.libelle_annee = state.c_annee[1]
-            /*if (state.notes.annee == '')
-                state.etudiants_ins=[]
-            else {
-                getEtudiantIns()
-            }*/
-        })
-        watch(() => state.c_semestre, () => {
-            state.notes.semestre = state.c_semestre[0]
-            state.notes.libelle_semestre = state.c_semestre[1]
-            if (state.notes.semestre == '')
-                state.etudiants_ins = []
-            else {
-                getEtudiantIns()
-            }
-        })
-        watch(() => state.c_unite, () => {
-            state.notes.unite = state.c_unite[0]
-            state.notes.libelle_unite = state.c_unite[1]
-            /* if (state.notes.unite == '' )
-                 state.etudiants_ins=[]
-             else {
-                 getEtudiantIns()
-             }*/
-        })
-        watch(() => state.c_matiere, () => {
-            state.notes.matiere = state.c_matiere[0]
-            state.notes.libelle_matiere = state.c_matiere[1]
-            console.log(state.c_matiere);
-            state.notes.credit_matiere = state.c_matiere[2]
-            /*if ( state.notes.matiere == '')
-                state.etudiants_ins=[]
-            else {
-                getEtudiantIns()
-            }*/
-        })
-
 
         watch(() => state.error, () => {
             if (state.error != '') {
@@ -473,7 +444,7 @@ export default defineComponent({
         })
 
 
-        return { ...toRefs(state), getUniteBySemestre, getMatiereByUE, getEtudiantIns, add, initSelect }
+        return { ...toRefs(state), getUniteBySemestre, getMatiereByUE, getEtudiantIns, add, initSelect , initMatiere }
 
 
     }

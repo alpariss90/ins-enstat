@@ -38,7 +38,7 @@ module.exports={
     },
     async getById(req, res){
         try {
-            const note=Note.findByPk(req.params.id)
+            const note=await Note.findByPk(req.params.id)
             res.send({note: note})
         } catch (error) {
             console.log('note getById note'+error);
@@ -47,10 +47,12 @@ module.exports={
     },
     async getAll(req, res){
         try {
-            const notes=Note.findAll()
+            const notes=await Note.findAll()
+            //console.log('les notes');
+            //console.log((await notes).length);
             res.send({notes: notes})
         } catch (error) {
-            console.log('note getAll note'+error);
+            console.log('error getAll note'+error);
             res.status(404).send({error: 'Error getAll '+error})
         }
     },
@@ -117,6 +119,20 @@ module.exports={
         } catch (error) {
             console.log('Error getMatiereByUE Notes '+error);
             res.status(404).send({error: 'Error getMatiereByUE '+error})
+        }
+    },
+
+    async getNoteByAnneeSemestreUniteMatiere(req, res){
+        console.log(req.body);
+        try {
+            const liste_note=await sequelize.query("select * from note where annee=:annee and semestre=:semestre and unite=:unite and matiere=:matiere",{
+                replacements: {annee: req.params.annee, semestre: req.params.semestre, unite: req.params.unite, matiere: req.params.matiere},
+                type: QueryTypes.SELECT
+            })
+            res.send({liste_note: liste_note})
+        } catch (error) {
+            console.log('Error getNoteByAnneeSemestreUniteMatiere Notes ', error);
+            res.status(404).send({error: 'Error getNoteByAnneeSemestreUniteMatiere '+error})
         }
     }
 

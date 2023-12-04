@@ -66,9 +66,6 @@ module.exports=(app)=>{
      app.get('/note/etudiant/:semestre', noteCtrl.getEtudiantIns)
      app.get('/note/ue/semestre/:semestre', noteCtrl.getUEBySemestre)
      app.get('/note/matiere/ue/:unite', noteCtrl.getMatiereByUE)
+     app.get('/note/filter/:annee/:semestre/:unite/:matiere', noteCtrl.getNoteByAnneeSemestreUniteMatiere)
 }
-
-
-
-
 

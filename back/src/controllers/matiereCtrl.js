@@ -33,7 +33,7 @@ module.exports={
 
     async getAll(req, res){
         try {
-            const matieres=await sequelize.query("select * from v_matiere",{
+            const matieres=await sequelize.query("SELECT m.id,m.libelle,m.credit,m.volume, m.unite AS id_unite,u.libelle AS libelle_unite,u.titre AS titre_unite,u.libelle_semestre FROM matiere m JOIN v_unite u ON m.unite = u.id",{
                 replacements: {},
                 type: QueryTypes.SELECT
             })

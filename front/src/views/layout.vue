@@ -29,8 +29,12 @@
                                     <li class="nav-item">
                                         <a class="nav-link" href="/inscription">INSCRIPTIONS</a>
                                     </li>
+                                    
                                     <li class="nav-item">
                                         <a class="nav-link" href="/note">NOTES</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/note">LISTE NOTE</a>
                                     </li>
                                    
                                 </ul>
