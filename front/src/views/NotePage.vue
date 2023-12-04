@@ -73,7 +73,7 @@
                 <ion-card>
                     <ion-card-header style="background-color: #E2E8E5;">
                         <ion-card-title>
-                            LIST ETUDIANT 
+                            LIST ETUDIANT
                         </ion-card-title>
                     </ion-card-header>
                     <ion-card-content>
@@ -96,13 +96,17 @@
                                     </tr>
                                     <tr v-for="s in etudiants_ins" :key="s.matricule" style="padding-top: 3px;">
                                         <td><!--<label>{{ s.matricule }}</label> -- -->{{ s.nom }} {{ s.prenom }}</td>
-                                        <td><input :disabled="notes.nombre_note<1" type="number" class="form-control from-control-sm" v-model="s.note1"
+                                        <td><input :disabled="notes.nombre_note < 1" type="number"
+                                                class="form-control from-control-sm" v-model="s.note1"
                                                 placeholder="note 1" /></td>
-                                        <td><input :disabled="notes.nombre_note < 2" type="number" class="form-control from-control-sm" v-model="s.note2"
+                                        <td><input :disabled="notes.nombre_note < 2" type="number"
+                                                class="form-control from-control-sm" v-model="s.note2"
                                                 placeholder="note 2" /></td>
-                                        <td><input :disabled="notes.nombre_note < 3" type="number" class="form-control from-control-sm" v-model="s.note3"
+                                        <td><input :disabled="notes.nombre_note < 3" type="number"
+                                                class="form-control from-control-sm" v-model="s.note3"
                                                 placeholder="note 3" /></td>
-                                        <td><input :disabled="notes.nombre_note <4" type="number" class="form-control from-control-sm" v-model="s.note4"
+                                        <td><input :disabled="notes.nombre_note < 4" type="number"
+                                                class="form-control from-control-sm" v-model="s.note4"
                                                 placeholder="note 4" /></td>
                                     </tr>
                                     <tr>
@@ -192,7 +196,7 @@
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs, onMounted, watch} from 'vue';
+import { defineComponent, reactive, toRefs, onMounted, watch } from 'vue';
 import service from '../services/service';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardContent } from '@ionic/vue'
 import NoteListe from '../components/NoteListeComponent.vue';
@@ -226,9 +230,9 @@ export default defineComponent({
                 note2: '',
                 note3: '',
                 note4: '',
-                credit_matiere: '',
+                credit_matiere: 0,
                 nombre_note: '',
-                credit_unite: ''
+                credit_unite: 0
             },
 
             c_annee: [],
@@ -261,22 +265,22 @@ export default defineComponent({
         }
 
         const getUniteBySemestre = async () => {
-            
+
             try {
                 const response = await service.getUEbySemestre(state.c_semestre[0]);
                 state.unites = response.data.unites_semestre;
-                state.notes.libelle_semestre=state.c_semestre[1]
-                state.notes.semestre=state.c_semestre[0]
+                state.notes.libelle_semestre = state.c_semestre[1]
+                state.notes.semestre = state.c_semestre[0]
                 state.notes.matiere = ''
                 state.notes.libelle_matiere = ''
                 state.notes.unite = ''
                 state.notes.libelle_unite = ''
-                state.c_matiere=[]
-                state.c_unite=[]
-                state.matieres=[]
-                state.etudiants_ins=[]
-                state.liste_note=[]
-                
+                state.c_matiere = []
+                state.c_unite = []
+                state.matieres = []
+                state.etudiants_ins = []
+                state.liste_note = []
+
 
 
             } catch (error) {
@@ -290,11 +294,11 @@ export default defineComponent({
                 state.matieres = response.data.matieres_unite;
                 state.notes.matiere = ''
                 state.notes.libelle_matiere = ''
-                state.notes.libelle_unite=state.c_unite[1]
-                state.notes.unite=state.c_unite[0]
-                state.c_matiere=[]
-                state.etudiants_ins=[]
-                state.liste_note=[]
+                state.notes.libelle_unite = state.c_unite[1]
+                state.notes.unite = state.c_unite[0]
+                state.c_matiere = []
+                state.etudiants_ins = []
+                state.liste_note = []
 
 
             } catch (error) {
@@ -302,12 +306,11 @@ export default defineComponent({
             }
         }
 
-        const initMatiere=()=>{
-            state.notes.libelle_matiere=state.c_matiere[1]
-            state.notes.matiere=state.c_matiere[0]
+        const initMatiere = () => {
+            state.notes.libelle_matiere = state.c_matiere[1]
+            state.notes.matiere = state.c_matiere[0]
             getEtudiantIns()
             getNoteFilter()
-
         }
 
         const getEtudiantIns = async () => {
@@ -331,16 +334,16 @@ export default defineComponent({
         }
 
         const initSelect = () => {
-            state.notes.libelle_annee=state.c_annee[1]
-            state.notes.annee=state.c_annee[0]
+            state.notes.libelle_annee = state.c_annee[1]
+            state.notes.annee = state.c_annee[0]
             state.notes.semestre = ''
             state.notes.unite = ''
             state.notes.matiere = ''
-            state.etudiants_ins=[]
+            state.etudiants_ins = []
         }
 
         const add = async () => {
-            
+
             if (
                 state.notes.annee === "" || state.notes.annee == undefined
                 || state.notes.semestre === "" || state.notes.semestre == undefined
@@ -355,6 +358,8 @@ export default defineComponent({
                 try {
                     const response = await service.addNoteMultiple(fetchNote())
                     state.success = response.data.success;
+                    getNoteFilter()
+                    clearNote()
                 } catch (error) {
                     state.error = error.response.data.error;
                 }
@@ -363,92 +368,152 @@ export default defineComponent({
 
         const checkEtudiantInsNote = () => {
             let isOk = true;
-            /*switch (notes.nombre_note) {
-                case 1:
-                    
-                    break;
-            
-                default:
-                    break;
-            }*/
             for (let i = 0; i < state.etudiants_ins.length; i++) {
-                if ('note1' in state.etudiants_ins[i] == false || 'note2' in state.etudiants_ins[i] == false || 'note3' in state.etudiants_ins[i] == false || 'note4' in state.etudiants_ins[i] == false) {
+                if (state.notes.nombre_note == 1 && ('note1' in state.etudiants_ins[i] == false || state.etudiants_ins[i].note1 === "" || state.etudiants_ins[i].note1 == undefined || state.etudiants_ins[i].note1 > 20 || state.etudiants_ins[i].note1 < 0)) {
                     isOk = false
-                    alert('1')
                     break;
                 } else if (
-                    state.etudiants_ins[i].note1 === "" || state.etudiants_ins[i].note1 == undefined || state.etudiants_ins[i].note1 > 20 || state.etudiants_ins[i].note1 < 0
-                    || state.etudiants_ins[i].note2 === "" || state.etudiants_ins[i].note2 == undefined || state.etudiants_ins[i].note2 > 20 || state.etudiants_ins[i].note2 < 0
-                    || state.etudiants_ins[i].note3 === "" || state.etudiants_ins[i].note3 == undefined || state.etudiants_ins[i].note3 > 20 || state.etudiants_ins[i].note3 < 0
-                    || state.etudiants_ins[i].note4 === "" || state.etudiants_ins[i].note4 == undefined || state.etudiants_ins[i].note4 > 20 || state.etudiants_ins[i].note4 < 0
+                    state.notes.nombre_note == 2
+                    && (
+                        'note1' in state.etudiants_ins[i] == false || 'note2' in state.etudiants_ins[i] == false
+                        || state.etudiants_ins[i].note1 === "" || state.etudiants_ins[i].note1 == undefined || state.etudiants_ins[i].note1 > 20 || state.etudiants_ins[i].note1 < 0
+                        || state.etudiants_ins[i].note2 === "" || state.etudiants_ins[i].note2 == undefined || state.etudiants_ins[i].note2 > 20 || state.etudiants_ins[i].note2 < 0
+                    )
                 ) {
+
                     isOk = false
-                    break
+                    break;
+                } else if (
+                    state.notes.nombre_note == 3
+                    && (
+                        'note1' in state.etudiants_ins[i] == false || 'note2' in state.etudiants_ins[i] == false || 'note3' in state.etudiants_ins[i] == false
+                        || state.etudiants_ins[i].note1 === "" || state.etudiants_ins[i].note1 == undefined || state.etudiants_ins[i].note1 > 20 || state.etudiants_ins[i].note1 < 0
+                        || state.etudiants_ins[i].note2 === "" || state.etudiants_ins[i].note2 == undefined || state.etudiants_ins[i].note2 > 20 || state.etudiants_ins[i].note2 < 0
+                        || state.etudiants_ins[i].note3 === "" || state.etudiants_ins[i].note3 == undefined || state.etudiants_ins[i].note3 > 20 || state.etudiants_ins[i].note3 < 0
+                    )
+                ) {
+
+                    isOk = false
+                    break;
+                } else if (
+                    state.notes.nombre_note == 4
+                    && (
+                        'note1' in state.etudiants_ins[i] == false || 'note2' in state.etudiants_ins[i] == false || 'note3' in state.etudiants_ins[i] == false || 'note4' in state.etudiants_ins[i] == false
+                        || state.etudiants_ins[i].note1 === "" || state.etudiants_ins[i].note1 == undefined || state.etudiants_ins[i].note1 > 20 || state.etudiants_ins[i].note1 < 0
+                        || state.etudiants_ins[i].note2 === "" || state.etudiants_ins[i].note2 == undefined || state.etudiants_ins[i].note2 > 20 || state.etudiants_ins[i].note2 < 0
+                        || state.etudiants_ins[i].note3 === "" || state.etudiants_ins[i].note3 == undefined || state.etudiants_ins[i].note3 > 20 || state.etudiants_ins[i].note3 < 0
+                        || state.etudiants_ins[i].note4 === "" || state.etudiants_ins[i].note4 == undefined || state.etudiants_ins[i].note4 > 20 || state.etudiants_ins[i].note4 < 0
+                    )
+                ) {
+
+                    isOk = false
+                    break;
                 }
+
+
+
+
+                /*
+                                if ('note1' in state.etudiants_ins[i] == false || 'note2' in state.etudiants_ins[i] == false || 'note3' in state.etudiants_ins[i] == false || 'note4' in state.etudiants_ins[i] == false) {
+                                    isOk = false
+                                    break;
+                                } else if (
+                                    state.etudiants_ins[i].note1 === "" || state.etudiants_ins[i].note1 == undefined || state.etudiants_ins[i].note1 > 20 || state.etudiants_ins[i].note1 < 0
+                                    || state.etudiants_ins[i].note2 === "" || state.etudiants_ins[i].note2 == undefined || state.etudiants_ins[i].note2 > 20 || state.etudiants_ins[i].note2 < 0
+                                    || state.etudiants_ins[i].note3 === "" || state.etudiants_ins[i].note3 == undefined || state.etudiants_ins[i].note3 > 20 || state.etudiants_ins[i].note3 < 0
+                                    || state.etudiants_ins[i].note4 === "" || state.etudiants_ins[i].note4 == undefined || state.etudiants_ins[i].note4 > 20 || state.etudiants_ins[i].note4 < 0
+                                ) {
+                                    isOk = false
+                                    break
+                                }
+                            }*/
+                
             }
+
             return isOk
-        }
-
-        const fetchNote = () => {
-            let notes = []
-            for (let i = 0; i < state.etudiants_ins.length; i++) {
-                notes.push({
-                    annee: state.notes.annee,
-                    libelle_annee: state.notes.libelle_annee,
-                    semestre: state.notes.semestre,
-                    libelle_semestre: state.notes.libelle_semestre,
-                    unite: state.notes.unite,
-                    libelle_unite: state.notes.libelle_unite,
-                    matiere: state.notes.matiere,
-                    libelle_matiere: state.notes.libelle_matiere,
-                    matricule: state.etudiants_ins[i].matricule,
-                    nom: state.etudiants_ins[i].nom,
-                    prenom: state.etudiants_ins[i].prenom,
-                    users: state.notes.users,
-                    note1: state.etudiants_ins[i].note1,
-                    note2: state.etudiants_ins[i].note2,
-                    note3: state.etudiants_ins[i].note3,
-                    note4: state.etudiants_ins[i].note4,
-                    nombre_note: state.notes.nombre_note,
-                    credit_matiere: state.notes.credit_matiere,
-                    moyenne_matiere: ((state.etudiants_ins[i].note1 + state.etudiants_ins[i].note2 + state.etudiants_ins[i].note3 + state.etudiants_ins[i].note4) / state.notes.nombre_note).toFixed(2),
-                    moyenne_unite: 0,//getMoyenneUnite(state.notes.unite, getUniteCredit(state.notes.unite), (state.etudiants_ins[i].note1 + state.etudiants_ins[i].note2 + state.etudiants_ins[i].note3 + state.etudiants_ins[i].note4) / state.notes.nombre_note),
-                    credit_obtenu: 0, //A implementer
-                    validation_unite: '-', //A implementer
-                    credit_unite: 0,//getUniteCredit(state.notes.unite)
-                })
-            }
-            return notes;
-        }
-
-
-
-
-        onMounted(() => {
-            getAnneeIns(), getSemestreIns()
-        })
-
-
         
+        }
 
-        watch(() => state.error, () => {
-            if (state.error != '') {
-                setTimeout(function () { state.error = '' }, 3000);
+            const fetchNote = () => {
+                let notes = []
+                for (let i = 0; i < state.etudiants_ins.length; i++) {
+                    let moy=0
+                    if(state.nombre_note ==1){
+                        moy=Number((state.etudiants_ins[i].note1).toFixed(2))
+                    }else if(state.notes.nombre_note ==2){
+                        moy=Number(((state.etudiants_ins[i].note1 + state.etudiants_ins[i].note2) / state.notes.nombre_note).toFixed(2))
+                    }else if(state.notes.nombre_note ==3){
+                        moy=Number(((state.etudiants_ins[i].note1 + state.etudiants_ins[i].note2 + state.etudiants_ins[i].note3) / state.notes.nombre_note).toFixed(2))
+                    }else if(state.notes.nombre_note ==4){
+                        moy=Number(((state.etudiants_ins[i].note1 + state.etudiants_ins[i].note2 + state.etudiants_ins[i].note3 + state.etudiants_ins[i].note4) / state.notes.nombre_note).toFixed(2))
+                    }
+                    notes.push({
+                        annee: state.notes.annee,
+                        libelle_annee: state.notes.libelle_annee,
+                        semestre: state.notes.semestre,
+                        libelle_semestre: state.notes.libelle_semestre,
+                        unite: state.notes.unite,
+                        libelle_unite: state.notes.libelle_unite,
+                        matiere: state.notes.matiere,
+                        libelle_matiere: state.notes.libelle_matiere,
+                        matricule: state.etudiants_ins[i].matricule,
+                        nom: state.etudiants_ins[i].nom,
+                        prenom: state.etudiants_ins[i].prenom,
+                        users: state.notes.users,
+                        note1: state.etudiants_ins[i].note1,
+                        note2: state.etudiants_ins[i].note2,
+                        note3: state.etudiants_ins[i].note3,
+                        note4: state.etudiants_ins[i].note4,
+                        nombre_note: state.notes.nombre_note,
+                        credit_matiere: state.notes.credit_matiere,
+                        moyenne_matiere: moy,//Number(((state.etudiants_ins[i].note1 + state.etudiants_ins[i].note2 + state.etudiants_ins[i].note3 + state.etudiants_ins[i].note4) / state.notes.nombre_note).toFixed(2)),
+                        moyenne_unite: 0,//getMoyenneUnite(state.notes.unite, getUniteCredit(state.notes.unite), (state.etudiants_ins[i].note1 + state.etudiants_ins[i].note2 + state.etudiants_ins[i].note3 + state.etudiants_ins[i].note4) / state.notes.nombre_note),
+                        credit_obtenu: 0, //A implementer
+                        validation_unite: '-', //A implementer
+                        credit_unite: 0,//getUniteCredit(state.notes.unite)
+                    })
+                }
+                return notes;
             }
-        })
 
-        watch(() => state.success, () => {
-            if (state.success != '') {
-                setTimeout(function () { state.success = '' }, 3000);
+            const clearNote = () => {
+                for (let i = 0; i < state.etudiants_ins.length; i++) {
+                    state.etudiants_ins[i].note1 = ''
+                    state.etudiants_ins[i].note2 = ''
+                    state.etudiants_ins[i].note3 = ''
+                    state.etudiants_ins[i].note4 = ''
+                }
+                state.notes.nombre_note = ''
             }
-        })
 
 
-        return { ...toRefs(state), getUniteBySemestre, getMatiereByUE, getEtudiantIns, add, initSelect , initMatiere }
 
 
-    }
-})
+            onMounted(() => {
+                getAnneeIns(), getSemestreIns()
+            })
+
+
+
+
+            watch(() => state.error, () => {
+                if (state.error != '') {
+                    setTimeout(function () { state.error = '' }, 3000);
+                }
+            })
+
+            watch(() => state.success, () => {
+                if (state.success != '') {
+                    setTimeout(function () { state.success = '' }, 3000);
+                }
+            })
+
+
+            return { ...toRefs(state), getUniteBySemestre, getMatiereByUE, getEtudiantIns, add, initSelect, initMatiere }
+
+
+        }
+    })
 
 </script>
 
