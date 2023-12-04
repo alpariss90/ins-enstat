@@ -69,6 +69,8 @@ module.exports={
     },
 
     async getSemestreIns(req, res){
+
+        req.session.user='alpariss'
         try {
             const semestres_ins=await sequelize.query("select * from semestre where id in (select semestre from inscription)",{
                 replacements: {},

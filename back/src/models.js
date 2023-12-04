@@ -209,6 +209,9 @@ const Note=sequelize.define('note',{
     libelle_unite: {
         type: DataTypes.STRING
     },
+    credit_unite:{
+        type: DataTypes.INTEGER
+    },
     matiere: {
         type: DataTypes.INTEGER,
         references:{
@@ -220,6 +223,9 @@ const Note=sequelize.define('note',{
     libelle_matiere: {
         type: DataTypes.STRING
     },
+    credit_matiere:{
+        type: DataTypes.INTEGER
+    },
     users: {
         type: DataTypes.STRING,
         references:{
@@ -227,8 +233,33 @@ const Note=sequelize.define('note',{
             key: 'login'
         }
     },
-    note:{
-        type: DataTypes.INTEGER,
+    note1:{
+        type: DataTypes.FLOAT,
+    },
+    note2:{
+        type: DataTypes.FLOAT,
+    },
+    note3:{
+        type: DataTypes.FLOAT,
+    },
+    note4:{
+        type: DataTypes.FLOAT,
+    },
+    nombre_note:{
+        type: DataTypes.INTEGER
+    },
+    moyenne_matiere: {
+        type: DataTypes.FLOAT
+
+    },
+    moyenne_unite:{
+        type: DataTypes.FLOAT
+    },
+    credit_obtenu:{
+        type: DataTypes.INTEGER
+    },
+    validation_unite:{
+        type: DataTypes.STRING
     }
 },{
     freezeTableName: true
