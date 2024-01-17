@@ -23,6 +23,7 @@ import '@ionic/vue/css/flex-utils.css';
 import '@ionic/vue/css/display.css';
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
+//import 'vue-pivottable/dist/vue-pivottable.css'
 /* Theme variables */
 import './theme/variables.css';
 

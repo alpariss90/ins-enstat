@@ -32,10 +32,13 @@
                                     
                                     <li class="nav-item">
                                         <a class="nav-link" href="/note">NOTES</a>
-                                    </li>
+                                    </li><!--
                                     <li class="nav-item">
                                         <a class="nav-link" href="/note">LISTE NOTE</a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/generate">CROISE</a>
+                                    </li>-->
                                    
                                 </ul>
                                 <form class="d-flex">

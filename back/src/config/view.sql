@@ -1,3 +1,5 @@
+update note set moyenne_matiere=note1 where note1 > 0 and note2 is null
+
 CREATE OR REPLACE VIEW public.v_unite
  AS
  SELECT u.id,

@@ -111,5 +111,18 @@ export default {
   },
   getNoteFilter(annee, semestre, unite, matiere) {
     return API().get("note/filter/" + annee+"/"+semestre+"/"+unite+"/"+matiere);
+  },
+  getCredit(matiere){
+    return API().get("note/get-credit/"+matiere);
+  },
+  calculCredit(matiere, creditMatiere, creditUnite){
+    return API().get("note/calcul-credit/"+ matiere+"/"+creditMatiere+"/"+creditUnite);
+  },
+  updateMoyenneUnite(unite){
+    return API().get("note/update-moyenne-ue/"+ unite);
   }
+
+
+  
+  
 };

@@ -1,6 +1,38 @@
 const {Note, sequelize, QueryTypes, transact}=require('../models')
 
 
+async function getMatiereByUnite(u){
+    const matieres=await sequelize.query("select * from matiere where unite=:unite",{
+        replacements: {unite: u},
+        type: QueryTypes.SELECT
+    })
+    return matieres;
+}
+
+async function getEtudiantInscrit(u){
+    const matieres=await sequelize.query("select etudiant from inscription where semestre in (select semestre from unite where id=:unite)",{
+        replacements: {unite: u},
+        type: QueryTypes.SELECT
+    })
+    return matieres;
+}
+
+async function getNoteUnite(u){
+    const matieres=await sequelize.query("select matricule, unite, matiere, credit_matiere, moyenne_matiere from note where unite=:unite",{
+        replacements: {unite: u},
+        type: QueryTypes.SELECT
+    })
+    return matieres;
+}
+/*
+async function getNoteByMatiere(u){
+    const matieres=await sequelize.query("select * from matiere where unite=:unite",{
+        replacements: {unite: u},
+        type: QueryTypes.SELECT
+    })
+    return matieres;
+}*/
+
 module.exports={
     
     async add(req, res){
@@ -123,7 +155,6 @@ module.exports={
     },
 
     async getNoteByAnneeSemestreUniteMatiere(req, res){
-        console.log(req.body);
         try {
             const liste_note=await sequelize.query("select * from note where annee=:annee and semestre=:semestre and unite=:unite and matiere=:matiere",{
                 replacements: {annee: req.params.annee, semestre: req.params.semestre, unite: req.params.unite, matiere: req.params.matiere},
@@ -133,6 +164,87 @@ module.exports={
         } catch (error) {
             console.log('Error getNoteByAnneeSemestreUniteMatiere Notes ', error);
             res.status(404).send({error: 'Error getNoteByAnneeSemestreUniteMatiere '+error})
+        }
+    },
+    async credits(req, res){
+        try {
+            const credits=await sequelize.query("select id, libelle, credit as credit_matiere, r2.unite, somme_unite from (select id, libelle, unite, credit from matiere where id=:matiere order by id) r1 left join(select  unite, sum(credit) as somme_unite from matiere group by unite order by unite) r2 on r1.unite=r2.unite",{
+                replacements: {matiere: req.params.matiere},
+                type: QueryTypes.SELECT
+            })
+            res.send({credits: credits})
+        } catch (error) {
+            console.log('Error credits Notes ', error);
+            res.status(404).send({error: 'Error credits '+error})
+        }
+    },
+
+    async calculCredit(req, res){
+        try {
+            const resultat=await sequelize.query("update note set credit_matiere=:credit_matiere, credit_unite=:credit_unite where matiere=:matiere",{
+                replacements: {matiere: req.params.matiere, credit_matiere: req.params.creditMatiere, credit_unite: req.params.creditUnite},
+                type: QueryTypes.UPDATE
+            })
+            res.send({resultat: resultat, success: "Operation effectue"})
+        } catch (error) {
+            console.log('Error calculCredit Notes ', error);
+            res.status(404).send({error: 'Error calculCredit '+error})
+        }
+    },
+
+    async upadteMoyenneUE(req, res){
+        try {
+            /*const resultat=await sequelize.query("update note set moyenne_unite=:valeur where unite=:unite",{
+                replacements: {valeur: req.params.valeur, unite: req.params.unite},
+                type: QueryTypes.UPDATE
+            })
+            res.send({resultat: resultat, success: "Operation effectue"})*/
+           const matieres=await getMatiereByUnite(req.params.unite)
+          // const nbre=matieres.length;
+           const etudiants= await getEtudiantInscrit(req.params.unite)
+           const notes=await getNoteUnite(req.params.unite)
+           let sommeCredit=0;
+           for(m in matieres){
+                sommeCredit+=matieres[m].credit
+           }
+
+           let moyenneUnite=[]
+
+          for(let i=0; i< etudiants.length; i++){
+              let pdt=0;
+              let creditObtenu=0;
+              
+              for(let j=0; j<notes.length; j++){
+                if(notes[j].matricule==etudiants[i].etudiant){
+                    pdt+=notes[j].credit_matiere * notes[j].moyenne_matiere;
+                    if(notes[j].moyenne_matiere >= 10){
+                        creditObtenu+=notes[j].credit_matiere
+                    }
+                }
+                
+              }
+
+              moyenneUnite.push({valide: "VALIDE", obtenu: creditObtenu, etudiant: etudiants[i].etudiant, moyenneUnite: (Number(pdt/sommeCredit).toFixed(2))})
+              
+              for(mm in moyenneUnite){
+                if (moyenneUnite[mm].moyenneUnite < 10){
+                    moyenneUnite[mm].valide="NON VALIDE"
+                }
+              }
+           }
+            //console.log(moyenneUnite);
+
+            for (m in moyenneUnite){
+                const resultat=await sequelize.query("update note set moyenne_unite=:valeur, credit_obtenu=:obtenu, validation_unite=:valide where unite=:unite and matricule=:etudiant",{
+                    replacements: {valide: moyenneUnite[m].valide, valeur: moyenneUnite[m].moyenneUnite, unite: req.params.unite, etudiant:moyenneUnite[m].etudiant, obtenu:  moyenneUnite[m].obtenu},
+                    type: QueryTypes.UPDATE
+                })
+            }
+
+            res.send({message: "ok"})
+        } catch (error) { 
+            console.log('Error updateMoyenneUE Notes ', error);
+            res.status(404).send({error: 'Error updateMoyenneUE '+error})
         }
     }
 

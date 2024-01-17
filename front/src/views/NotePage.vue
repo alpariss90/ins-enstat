@@ -148,8 +148,11 @@
                     </ion-card-content>
                 </ion-card>
             </div>
+           
             <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
-                <ion-card>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <ion-card>
                     <ion-card-header style="background-color: #E2E8E5;">
                         <ion-card-title>
                             FILTRE
@@ -189,7 +192,25 @@
                         <b style="color: rgb(30, 152, 30);">MATIERE CHOISIE :</b> {{ notes.libelle_matiere }} <br>
                     </ion-card-content>
                 </ion-card>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <ion-card>
+                    <ion-card-header style="background-color: #E2E8E5;">
+                        <ion-card-title>
+                            ACTIONS
+                        </ion-card-title>
+                    </ion-card-header>
+                    <ion-card-content>
+                        <button class="btn btn-primary m-3" v-on:click="calcul_credit">CALCUL DE CREDIT </button>
+                        <button class="btn btn-success m-3"  v-on:click="updateMoyenneUnite">CALCUL D'UNITE</button>
+                    </ion-card-content>
+                </ion-card>
+                    </div>
+                </div>
+                
             </div>
+
+            
         </div>
         <note-liste :notes="liste_note"></note-liste>
     </layout-template>
@@ -240,10 +261,49 @@ export default defineComponent({
             c_unite: '',
             c_matiere: '',
             notes_saisie: [],
-            liste_note: []
+            liste_note: [],
+            credits:{}
 
 
         })
+
+
+        const calcul_credit=async ()=>{
+            try {
+                await getCredit()
+                const c=JSON.parse(JSON.stringify(state.credits)).shift()
+                //console.log(c);
+                //console.log(state.credits.credit_matiere+" "+state.credits.somme_unite);
+               const response = await service.calculCredit(c.id, c.credit_matiere, c.somme_unite);
+               console.log(response);
+            } catch (error) {
+                console.log("Erreur calcul_credit ", error);
+            }
+        }
+
+        const updateMoyenneUnite=async ()=>{
+            try {
+                //await getCredit()
+                //await calcul_credit()
+               const response = await service.updateMoyenneUnite(state.c_unite[0]);
+               console.log(response);
+            } catch (error) {
+                console.log("Erreur updateMoyenneUnite ", error);
+            }
+        }
+
+
+
+        const getCredit=async ()=>{
+            try {
+                const response = await service.getCredit(state.c_matiere[0]);
+                state.credits = response.data.credits;
+                console.log(state.credits);
+            } catch (error) {
+                console.log("Erreur getCredit ", error);
+            }
+        }
+
 
 
         const getAnneeIns = async () => {
@@ -509,7 +569,7 @@ export default defineComponent({
             })
 
 
-            return { ...toRefs(state), getUniteBySemestre, getMatiereByUE, getEtudiantIns, add, initSelect, initMatiere }
+            return { ...toRefs(state), getCredit,updateMoyenneUnite, getUniteBySemestre, getMatiereByUE, getEtudiantIns, add, initSelect, initMatiere, calcul_credit }
 
 
         }

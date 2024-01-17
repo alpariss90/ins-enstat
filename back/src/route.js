@@ -31,6 +31,7 @@ module.exports=(app)=>{
     app.post('/matiere/save', matiereCtrl.add)
     app.post('/matiere/edit', matiereCtrl.edit),
     app.get('/matiere/get/:id', matiereCtrl.getById),
+    app.get('/matiere/get-by-UE/:id', matiereCtrl.getByUE),
     app.get('/matiere/all', matiereCtrl.getAll)
 
     /***
@@ -67,5 +68,8 @@ module.exports=(app)=>{
      app.get('/note/ue/semestre/:semestre', noteCtrl.getUEBySemestre)
      app.get('/note/matiere/ue/:unite', noteCtrl.getMatiereByUE)
      app.get('/note/filter/:annee/:semestre/:unite/:matiere', noteCtrl.getNoteByAnneeSemestreUniteMatiere)
+     app.get('/note/get-credit/:matiere', noteCtrl.credits)
+     app.get('/note/update-moyenne-ue/:unite', noteCtrl.upadteMoyenneUE)
+     app.get('/note/calcul-credit/:matiere/:creditMatiere/:creditUnite', noteCtrl.calculCredit)
 }
 

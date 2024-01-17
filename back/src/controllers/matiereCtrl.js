@@ -42,6 +42,19 @@ module.exports={
             console.log('Error getAll Matiere '+error);
             res.status(404).send({error: 'Error getAll '+error})
         }
+    },
+
+    async getByUE(req, res){
+        try {
+            const matieres=await sequelize.query("SELECT * from matiere where unite=:unite",{
+                replacements: {unite: req.params.unite},
+                type: QueryTypes.SELECT
+            })
+            res.send({matieres: matieres})
+        } catch (error) {
+            console.log('Error getByUE Matiere '+error);
+            res.status(404).send({error: 'Error getByUE '+error})
+        }
     }
 
 }

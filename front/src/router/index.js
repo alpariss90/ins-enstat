@@ -6,6 +6,7 @@ import MatierePage from '../views/MatierePage.vue'
 import EtudiantPage from '../views/EtudiantPage.vue'
 import InscriptionPage from '../views/InscriptionPage.vue'
 import NotePage from '../views/NotePage.vue'
+import PivotPage from '../views/PivotPage.vue'
 
 const routes= [
   {
@@ -41,6 +42,10 @@ const routes= [
   {
     path: '/note',
     component: NotePage
+  },
+  {
+    path: '/generate',
+    component: PivotPage
   }
 ]
 
